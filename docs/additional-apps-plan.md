@@ -29,8 +29,8 @@ permission “just in case”.
 
 ## Verae backlog (recommended order)
 
-These fill gaps the current cubes leave in the UI. None exist as
-installable apps today.
+These fill gaps the current cubes leave in the UI. **Wave 2 (2026-08-16)
+built all seven** as independent repos; each `make certify` passed.
 
 | # | App | Pattern | Why |
 | --- | --- | --- | --- |
