@@ -24,6 +24,8 @@ Read in this order if you are new:
 | [additional-apps-plan.md](additional-apps-plan.md) | Decision tree, Verae backlog, acceptance checklist |
 | [lectures-and-talks.md](lectures-and-talks.md) | Official lectures and slides |
 | [third-party-projects.md](third-party-projects.md) | Official example-apps, upstreams, Verae apps |
+| [knowledge-summary.md](knowledge-summary.md) | Reviewable digest of the 2026-08 session |
+| [session-dialog-2026-08.md](session-dialog-2026-08.md) | Turn-by-turn dialog archive |
 
 Canonical protocol chapter (same text as https://book.peergos.org/features/apps.html):
 

@@ -20,6 +20,8 @@ and [verae-ops](https://github.com/DataCube-Modules/verae-ops).
 | 6 | [docs/additional-apps-plan.md](docs/additional-apps-plan.md) | Decision tree, Verae backlog, acceptance checklist |
 | 7 | [docs/third-party-projects.md](docs/third-party-projects.md) | Official example-apps, upstreams, Verae apps |
 | 8 | [protocol/peergos-book-apps.md](protocol/peergos-book-apps.md) | Vendored Peergos book “Custom Apps” chapter (same as https://book.peergos.org/features/apps.html) |
+| 9 | [docs/knowledge-summary.md](docs/knowledge-summary.md) | Reviewable digest of the 2026-08 session |
+| 10 | [docs/session-dialog-2026-08.md](docs/session-dialog-2026-08.md) | Turn-by-turn dialog archive |
 
 Index copy: [docs/README.md](docs/README.md).
 
