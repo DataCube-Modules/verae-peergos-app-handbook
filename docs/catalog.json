@@ -9,7 +9,14 @@
         {"name": "itad", "title": "ITAD DataCube", "blurb": "IT asset disposition cubes: pickup through wipe and sale."},
         {"name": "wine", "title": "Wine DataCube", "blurb": "Beverage provenance cubes and ISO proof export."},
         {"name": "signatures", "title": "Signatures", "blurb": "Sign and revoke DataCube object identities (ed25519)."},
-        {"name": "org-admin", "title": "Org Admin", "blurb": "Users, quotas, invites, space requests, audit, billing (admins only)."}
+        {"name": "org-admin", "title": "Org Admin", "blurb": "Users, quotas, invites, space requests, audit, billing (admins only)."},
+        {"name": "cube-browser", "title": "Cube Browser", "blurb": "List cubes, objects, and dual hashes without NATS."},
+        {"name": "share-wizard", "title": "Share Wizard", "blurb": "Share modes A/B/C; write a share plan into the cube."},
+        {"name": "timestamp-inbox", "title": "TS Inbox", "blurb": "Show Local/Shared/Global timestamp receipts from inbox."},
+        {"name": "iso-export", "title": "ISO Export", "blurb": "Enqueue verae.cube.export for host xorriso ISO packager."},
+        {"name": "itad-board", "title": "ITAD Board", "blurb": "Kanban pickup through wipe and sale; append via outbox."},
+        {"name": "sig-verify", "title": "Sig Verify", "blurb": "List valid/revoked signatures; enqueue verae.sig.verify."},
+        {"name": "connector-status", "title": "Conn Status", "blurb": "List outbox pending vs inbox acked connector jobs."}
       ]
     },
     {

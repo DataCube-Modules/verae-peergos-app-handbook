@@ -1,0 +1,196 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><title>Wave 2 Peergos apps</title>
+<style>body{font-family:Georgia,serif;max-width:48rem;margin:2rem auto;padding:0 1rem;color:#222}
+h1,h2,h3{color:#1f4e79} code,pre{font-family:ui-monospace,monospace;font-size:.9rem}
+pre{background:#f4f6f8;padding:1rem;overflow:auto} table{border-collapse:collapse}
+td,th{border:1px solid #ccc;padding:.3rem .5rem}</style></head><body>
+<article><pre># Wave 2 Peergos apps — high-level description
+
+Seven installable Peergos apps close the UI gaps after hello-cube, ITAD,
+wine, and signatures. Each app is its own git repository. They store
+state in the Peergos Cryptree via `/peergos-api/v0/data`. They never
+open NATS. Connectors on the desktop host watch `outbox/` and publish
+JetStream subjects registered in `verae-nats-bus`.
+
+| App | Repo | Specialist | What the user sees |
+| --- | --- | --- | --- |
+| Cube Browser | verae-app-cube-browser | JS + integrity | List cubes and dual hashes |
+| Share Wizard | verae-app-share-wizard | Frontend + integrity | Modes A/B/C → `share-plan.json` |
+| TS Inbox | verae-app-timestamp-inbox | Timestamp + JS | Local/Shared/Global receipts |
+| ISO Export | verae-app-iso-export | Storage + wine UI | Queue `verae.cube.export` |
+| ITAD Board | verae-app-itad-board | ITAD SME + JS | pickup→wipe→sale appends |
+| Sig Verify | verae-app-sig-verify | Crypto + JS | valid/revoked + `verae.sig.verify` |
+| Conn Status | verae-app-connector-status | Messaging + host | outbox pending vs inbox acked |
+
+Plan: [PLAN-APPS-WAVE2.md](https://github.com/DataCube-Modules/Verae-DataCube-Solution-Pieces/blob/main/PLAN-APPS-WAVE2.md)
+in Solution-Pieces (also copied conceptually here).
+
+Peergos-compliant means: valid `peergos-app.json`, `assets/index.html`,
+no WebSocket/NATS in the iframe, `fetch` only to `/peergos-api` or
+relative files, unit tests green. Certified with `make certify` on
+2026-08-16.
+</pre></article><hr>
+<article><pre># Wave 2 installation guide
+
+## Prerequisites
+
+- Peergos account on https://peergos.georgelambert.org (or local daemon)
+- Java 21 + `Peergos.jar` if using OrgTool
+- Desktop-host connectors for outbox subjects (timestamp, append, export, verify)
+
+## Install one app
+
+From a clone of e.g. `verae-app-cube-browser`:
+
+```bash
+# Web: upload peergos-app.json + assets/, then Install App
+# CLI:
+java -cp Peergos.jar OrgTool install-app \
+  https://peergos.georgelambert.org "$USER" "$PASS" cube-browser .
+```
+
+Or wait for gallery publish: Apps → Custom → Install.
+
+## Install all seven
+
+```bash
+for r in cube-browser share-wizard timestamp-inbox iso-export itad-board sig-verify connector-status; do
+  echo "== $r =="
+  # OrgTool install-app ... $r ~/research/verae-app-$r
+done
+```
+
+## Connector subjects to enable on the host
+
+| Subject | App |
+| --- | --- |
+| `verae.ts.request` / receipts | timestamp-inbox (reads inbox) |
+| `verae.cube.append` | itad-board |
+| `verae.cube.export` | iso-export (new) |
+| `verae.sig.verify` | sig-verify (new) |
+
+`verae.cube.export` and `verae.sig.verify` were added to
+`verae-nats-bus/schemas/subjects.json`. Host connectors must implement
+them before those two apps do useful work beyond queueing files.
+
+## Verify
+
+```bash
+cd ~/research/verae-app-cube-browser &amp;&amp; make certify
+```
+
+Repeat per repo. Expected: `peergos compliance: PASS`.
+</pre></article><hr>
+<article><pre># Wave 2 developer reference
+
+Each repo follows the same layout:
+
+```
+peergos-app.json
+assets/index.html     # sandbox UI
+assets/sdk.js         # browser VeraeSDK
+src/peergos-sdk.mjs   # ESM for tests
+src/lib.mjs           # specified functions
+tests/lib.test.mjs
+tests/certify-peergos.sh
+docs/SPECS.md         # function I/O + behavior
+docs/INSTALL.md
+docs/DEVELOPER.md
+```
+
+## Function index
+
+| Repo | Functions |
+| --- | --- |
+| cube-browser | `listCubes`, `listCubeObjects`, `extractHashes` |
+| share-wizard | `buildSharePlan`, `writeSharePlan`, `planIncludes` |
+| timestamp-inbox | `listInbox`, `parseReceipt`, `scopeRank` |
+| iso-export | `enqueueExport`, `parseExportAck` |
+| itad-board | `STAGES`, `nextStage`, `columnize`, `enqueueStage` |
+| sig-verify | `listValid`, `listRevoked`, `isRevoked`, `enqueueVerify` |
+| connector-status | `listOutbox`, `listInbox`, `jobStem`, `classifyJobs` |
+
+See each `docs/SPECS.md` for inputs, outputs, and internal behavior.
+
+## Shared client
+
+`createClient(fetch)`:
+
+- `writeJSON(path, obj)` → PUT `/peergos-api/v0/data`+path
+- `readJSON(path)` → GET JSON
+- `list(path)` → `{files, subFolders}` (Peergos folder GET)
+
+`makeEnvelope(subject, payload, reply_file?)`  
+`enqueue(client, name, envelope)` → `/outbox/&lt;name&gt;.json`
+
+## Compliance
+
+`make certify` fails if assets contain `nats.connect`, `WebSocket`,
+`wss://`, or absolute `http(s)` `fetch`. Manifest displayName ≤ 25,
+description ≤ 100, schemaVersion 1, launchable true.
+</pre></article><hr>
+<article><pre># Wave 2 Peergos apps — plan
+
+### Comments:
+
+Independent installable Peergos apps that close UI gaps after hello-cube /
+ITAD / wine / signatures. Each app is its **own git repo**. Apps never
+open NATS; they write Peergos files. Connectors on `verae-desktop-host`
+watch `/.apps/&lt;name&gt;/data/outbox/` and publish JetStream.
+
+## Integration (Peergos + files + NATS)
+
+```
+Sandbox app
+  → PUT/GET /peergos-api/v0/data/...     (Cryptree files)
+  → PUT /outbox/&lt;job&gt;.json               {subject, payload, reply_file?}
+Connector (host, not sandbox)
+  → NATS JetStream verae.*
+  → PUT /inbox/&lt;reply&gt;.json
+App polls or lists /inbox/               (still no NATS)
+```
+
+| Subject | Who writes outbox | Payload | Inbox reply |
+| --- | --- | --- | --- |
+| `verae.ts.request` | timestamp-inbox (re-stamp), others already | hash, cube_id, scope | receipt JSON |
+| `verae.cube.append` | itad-board | block | optional ack |
+| `verae.cube.export` | iso-export | cube_id, format=iso, share_mode | export path / error |
+| `verae.sig.verify` | sig-verify | object_sha256, signature_id | {ok, reason} |
+
+File roots (all under `/.apps/&lt;app&gt;/data/`):
+
+- `/cubes/&lt;id&gt;/manifest.json` + objects
+- `/outbox/*.json` pending jobs
+- `/inbox/*.json` connector replies
+- `/signatures/valid|revoked/*.json`
+
+## Repos, specialists, functions
+
+| Repo | Specialist | Pattern | Functions |
+| --- | --- | --- | --- |
+| `verae-app-cube-browser` | JS + integrity | A+C | `listCubes`, `listCubeObjects`, `extractHashes` |
+| `verae-app-share-wizard` | Frontend + integrity | A | `validateShare`, `buildSharePlan`, `writeSharePlan` |
+| `verae-app-timestamp-inbox` | Timestamp + JS | A | `listInbox`, `parseReceipt`, `scopeRank` |
+| `verae-app-iso-export` | Storage + wine frontend | A | `enqueueExport`, `parseExportAck` |
+| `verae-app-itad-board` | ITAD SME + JS | A | `STAGES`, `columnize`, `enqueueStage` |
+| `verae-app-sig-verify` | Crypto + JS | A | `listValid`, `listRevoked`, `isRevoked`, `enqueueVerify` |
+| `verae-app-connector-status` | Messaging + host | A | `listOutbox`, `classifyJobs` |
+
+## Peergos compliance (certify)
+
+1. `peergos-app.json`: schemaVersion 1, displayName ≤25, description ≤100, SemVer, launchable, minimum permissions.
+2. Published tree = `peergos-app.json` + `assets/` (`index.html` required).
+3. Assets never mention `nats.connect`, `ws://`, `wss://`, or absolute `https://` fetches (except comments).
+4. All `fetch` targets start with `/peergos-api/` or are relative.
+5. Unit tests pass (`make test`).
+6. Outbox envelopes use registered subjects only.
+
+## Build / test / docs
+
+Each repo: `src/*.mjs` (specified functions) → `tests/*.test.mjs` →
+`assets/` UI → `docs/{SPECS,INSTALL,DEVELOPER}.md` → `make test` +
+`make certify`.
+
+Handbook PDFs: `docs/published/` in this wave’s handbook or
+`verae-peergos-app-handbook/docs/published/`.
+</pre></article><hr>
+</body></html>
