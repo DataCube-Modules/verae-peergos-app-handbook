@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recommended apps</title>
+  <style>
+    body { font-family: "Source Sans 3", "Segoe UI", sans-serif; margin: 0; background: #f4f6f8; color: #1a1a1a; }
+    header { background: #1f4e79; color: #fff; padding: 1rem 1.2rem; }
+    h1 { margin: 0; font-size: 1.35rem; }
+    header p { margin: .35rem 0 0; opacity: .9; font-size: .95rem; }
+    nav { display: flex; flex-wrap: wrap; gap: .4rem; max-width: 56rem; margin: .9rem auto 0; padding: 0 1rem; }
+    nav a { font-size: .85rem; color: #1f4e79; background: #e8eef4; border-radius: 999px; padding: .2rem .65rem; text-decoration: none; }
+    main { max-width: 56rem; margin: .6rem auto; padding: 0 1rem 2rem; }
+    h2 { margin: 1.4rem 0 .6rem; font-size: 1.05rem; color: #163654; border-bottom: 1px solid #d5dde5; padding-bottom: .25rem; }
+    .note { background: #fff8e6; border: 1px solid #ecd9a0; border-radius: 10px; padding: .7rem .9rem; font-size: .9rem; color: #5a4a1e; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: .65rem; }
+    .card { background: #fff; border: 1px solid #d5dde5; border-radius: 12px; padding: .85rem .95rem; }
+    .card h3 { margin: 0 0 .25rem; font-size: 1rem; color: #1f4e79; }
+    .card p { color: #5b6570; margin: 0 0 .65rem; font-size: .88rem; }
+    button { background: #1f4e79; color: #fff; border: 0; border-radius: 8px; padding: .4rem .8rem; font-weight: 650; cursor: pointer; }
+    button:hover { background: #163654; }
+    .msg { margin-top: .4rem; font-size: .82rem; min-height: 1em; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Recommended apps</h1>
+    <p>Verae DataCube apps plus the published Peergos example-apps set. Calendar, PDF, social, and Drive are built into Peergos and do not install from here.</p>
+  </header>
+  <nav id="toc"></nav>
+  <main id="list">
+    <p class="note">Install copies the app into your account. After that it appears on Apps. Use <strong>Update</strong> there when a newer version is published.</p>
+  </main>
+  <script>
+    const SECTIONS = [
+      { id: "verae", title: "Verae DataCube", apps: [
+        { name: "hello-cube", title: "Hello Cube", blurb: "Create a DataCube, append an object, request a local timestamp." },
+        { name: "itad", title: "ITAD DataCube", blurb: "IT asset disposition cubes: pickup through wipe and sale." },
+        { name: "wine", title: "Wine DataCube", blurb: "Beverage provenance cubes and ISO proof export." },
+        { name: "signatures", title: "Signatures", blurb: "Sign and revoke DataCube object identities (ed25519)." },
+        { name: "org-admin", title: "Org Admin", blurb: "Users, quotas, invites, space requests, audit, billing (admins only)." }
+      ]},
+      { id: "office", title: "Documents and office", apps: [
+        { name: "ck-editor", title: "CK Editor", blurb: "Rich text editor for .html files." },
+        { name: "doc-viewer", title: "Document Viewer", blurb: "View .docx and .odt (default association)." },
+        { name: "doc2html", title: "Doc to HTML", blurb: "Convert .docx / .odt to .html." },
+        { name: "html2doc", title: "HTML to Doc", blurb: "Convert .html to .docx." },
+        { name: "luckysheet", title: "Luckysheet", blurb: "Spreadsheet (.sheet); import .xlsx / .ods." },
+        { name: "luckysheet2excel", title: "Luckysheet to Excel", blurb: "Export .sheet to .xlsx (experimental)." },
+        { name: "weboffice", title: "Web Office", blurb: "LibreOffice / ZetaJS office suite." },
+        { name: "file2pdf", title: "File to PDF", blurb: "Convert office files to PDF." },
+        { name: "pandoc", title: "Pandoc", blurb: "Universal document converter (WASM)." },
+        { name: "notes", title: "Notes", blurb: "Block-style editor for .note files." },
+        { name: "tui-markdown-editor", title: "TUI Markdown", blurb: "WYSIWYG markdown editor." },
+        { name: "texteditor", title: "Text Editor", blurb: "Simple textarea editor." },
+        { name: "pretty-diff", title: "Pretty Diff", blurb: "Compare two text files." },
+        { name: "ebookreader", title: "Ebook reader", blurb: "Read .epub files." }
+      ]},
+      { id: "draw", title: "Drawing and diagrams", apps: [
+        { name: "tldraw", title: "Tldraw", blurb: "Whiteboard for .tldr files." },
+        { name: "drawio", title: "Draw.io", blurb: "Diagrams for .drawio files." },
+        { name: "mindmaps", title: "Mind Maps", blurb: "Mind-mapping canvas." },
+        { name: "paintz", title: "PaintZ", blurb: "MS Paint clone." },
+        { name: "jspaint", title: "JS Paint", blurb: "Classic MS Paint clone." },
+        { name: "tui-image-editor", title: "TUI Image Editor", blurb: "Photo editor (open from an image)." },
+        { name: "mini-photo-editor", title: "Mini Photo Editor", blurb: "Lightweight photo edits." }
+      ]},
+      { id: "media", title: "Media", apps: [
+        { name: "audio-player", title: "Audio Player", blurb: "Play all audio in a folder." },
+        { name: "webamp", title: "Webamp", blurb: "Winamp 2 in the browser." },
+        { name: "vlc.js", title: "VLC.js", blurb: "VLC media player (WASM)." },
+        { name: "image-slideshow", title: "Image Slideshow", blurb: "Gallery of images in a folder." },
+        { name: "img-viewer", title: "Image Viewer", blurb: "View, rotate, and scale images." },
+        { name: "album", title: "Album", blurb: "Shareable photo albums." },
+        { name: "photoroll", title: "Photo Roll", blurb: "Single-instance photo roll (HEIC)." },
+        { name: "device-capture", title: "Device Capture", blurb: "Capture image or video from the device." },
+        { name: "heic2jpg", title: "HEIC to JPEG", blurb: "Convert HEIC/HEIF to JPEG." },
+        { name: "exiftool", title: "ExifTool", blurb: "Read media metadata." },
+        { name: "media-metadata-scrubber", title: "Metadata scrubber", blurb: "Remove TIFF/EXIF/GPS metadata." }
+      ]},
+      { id: "notes", title: "Notes, wiki, and tasks", apps: [
+        { name: "tiddlywiki", title: "TiddlyWiki", blurb: "Non-linear personal notebook." },
+        { name: "feather-wiki", title: "Feather Wiki", blurb: "Tiny self-contained wiki." },
+        { name: "projectify", title: "Projectify", blurb: "TiddlyWiki project board." },
+        { name: "todo", title: "Todo", blurb: "Kanban-style plans." },
+        { name: "tasks", title: "Tasks", blurb: "Task lists." },
+        { name: "todoMVC", title: "Todo List", blurb: "Vanilla TodoMVC list." }
+      ]},
+      { id: "comms", title: "Mail, chat, and forums", apps: [
+        { name: "email", title: "Email", blurb: "Mailbox API client." },
+        { name: "chat", title: "Chat", blurb: "Chat with friends." },
+        { name: "forum", title: "Forum", blurb: "Discussion forums." }
+      ]},
+      { id: "tools", title: "Tools", apps: [
+        { name: "calculator", title: "Scientific Calculator", blurb: "Intel webapps scientific calculator." }
+      ]},
+      { id: "games", title: "Games and extras", apps: [
+        { name: "chess", title: "Chess", blurb: "Chess over the chat API." },
+        { name: "go", title: "Go", blurb: "Go board." },
+        { name: "sudoku", title: "Sudoku", blurb: "Sudoku puzzles." },
+        { name: "tictactoe", title: "Tic Tac Toe", blurb: "Tic-tac-toe over chat." },
+        { name: "doom", title: "Doom (shareware)", blurb: "Doom in jsdosbox." },
+        { name: "skymap", title: "Sky map", blurb: "Astronomy sky map (IK-Pegasi)." },
+        { name: "audio-recorder", title: "Audio Recorder", blurb: "Record audio notes (upstream marks this incomplete)." },
+        { name: "chat-api", title: "Chat API demo", blurb: "Example of the chat API for apps." },
+        { name: "docx-to-html", title: "DOCX extractor", blurb: "DOCX to HTML via XSweet (needs SaxonJS for full function)." }
+      ]}
+    ];
+    const toc = document.getElementById("toc");
+    const root = document.getElementById("list");
+    function install(name, msg) {
+      msg.textContent = "Opening installer…";
+      const fd = new FormData();
+      fd.append("path", "/peergos/recommended-apps");
+      fd.append("appName", name);
+      fetch("/peergos-api/v0/install-app/", { method: "POST", body: fd }).then(res => {
+        msg.textContent = res.ok
+          ? "Installer opened. Grant the requested permissions."
+          : "Install failed (" + res.status + "). Open /peergos/recommended-apps/" + name + "/peergos-app.json and choose Install App.";
+      }).catch(() => {
+        msg.textContent = "Could not reach the installer API. Open /peergos/recommended-apps/" + name + "/peergos-app.json and choose Install App.";
+      });
+    }
+    SECTIONS.forEach(sec => {
+      const a = document.createElement("a");
+      a.href = "#" + sec.id;
+      a.textContent = sec.title;
+      toc.appendChild(a);
+      const h = document.createElement("h2");
+      h.id = sec.id;
+      h.textContent = sec.title;
+      root.appendChild(h);
+      const grid = document.createElement("div");
+      grid.className = "grid";
+      sec.apps.forEach(app => {
+        const el = document.createElement("article");
+        el.className = "card";
+        el.id = app.name;
+        el.innerHTML = "<h3>" + app.title + "</h3><p>" + app.blurb + "</p><button type=\"button\">Install</button><div class=\"msg\"></div>";
+        const btn = el.querySelector("button");
+        const msg = el.querySelector(".msg");
+        btn.addEventListener("click", () => install(app.name, msg));
+        grid.appendChild(el);
+      });
+      root.appendChild(grid);
+    });
+    if (location.hash) {
+      const el = document.getElementById(location.hash.slice(1));
+      if (el) el.scrollIntoView();
+    }
+  </script>
+</body>
+</html>
