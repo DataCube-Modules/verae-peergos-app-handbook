@@ -95,8 +95,14 @@ A desktop-host **connector** watches
 
 Host connector (`Verae-Peergos/services/connectors/cube-nats`) watches
 `.apps/*/outbox` and `.apps/*/data/outbox`, Request-replies
-`verae.cube.export` (xorriso or zip named `.iso`) and `verae.sig.verify`
-(valid vs revoked records). Share A keeps only manifest/chain/receipt/hash/share-plan.
+`verae.cube.export` (xorriso or zip named `.iso`), `verae.sig.verify`
+(valid vs revoked records), and `verae.cube.append` (event file +
+`events.jsonl`). Share A keeps only manifest/chain/receipt/hash/share-plan.
+
+`OrgTool bridge` (desktop-host profile `bridge`) copies Cryptree outboxes
+into the connector root and pushes inbox + `/exports` back so sandbox
+apps see replies. Without the bridge, Docker-volume smoke tests work but
+live Peergos apps do not.
 
 ### Cube file layout these apps assume
 
