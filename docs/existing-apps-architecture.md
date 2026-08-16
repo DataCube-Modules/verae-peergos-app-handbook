@@ -81,6 +81,23 @@ A desktop-host **connector** watches
 - Revoke writes the revoked record; verification (Go, ed25519) is host-side.
 - No K9/REQL.
 
+### Wave-2 apps (pattern A)
+
+| App | Repo | I/O |
+| --- | --- | --- |
+| Cube Browser | `verae-app-cube-browser` | Reads `data/cubes/*` only. No outbox. |
+| Share Wizard | `verae-app-share-wizard` | Writes `share-plan.json` into the cube. |
+| TS Inbox | `verae-app-timestamp-inbox` | Lists `data/inbox/*` receipts. |
+| ISO Export | `verae-app-iso-export` | Enqueues `verae.cube.export` `{cube_id, format, share_mode}`. |
+| ITAD Board | `verae-app-itad-board` | Kanban UI; appends via `verae.cube.append`. |
+| Sig Verify | `verae-app-sig-verify` | Lists valid/revoked; enqueues `verae.sig.verify`. |
+| Conn Status | `verae-app-connector-status` | Counts outbox pending vs inbox acked. |
+
+Host connector (`Verae-Peergos/services/connectors/cube-nats`) watches
+`.apps/*/outbox` and `.apps/*/data/outbox`, Request-replies
+`verae.cube.export` (xorriso or zip named `.iso`) and `verae.sig.verify`
+(valid vs revoked records). Share A keeps only manifest/chain/receipt/hash/share-plan.
+
 ### Cube file layout these apps assume
 
 ```
