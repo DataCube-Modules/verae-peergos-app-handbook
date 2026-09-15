@@ -50,6 +50,13 @@ A desktop-host **connector** watches
 `/<user>/.apps/<app>/data/outbox/` and publishes JetStream
 `verae.<domain>.<resource>.<action>`. Replies land in `data/inbox/`.
 
+### pfc-inspect (`peergos-for-compliance/apps/inspect/`)
+
+- Pattern A. `STORE_APP_DATA` only. Enqueues `verae.inspect.open|join|access|close`.
+- Host: OrgTool `bridge` copies Cryptree `/.apps/pfc-inspect/data/outbox` to
+  `/opt/pfc/bridge`; `outbox-connector.py` publishes NATS (never from the iframe).
+- k-of-n officers are cube share names, not Google / Peergos Drive login.
+
 ### hello-cube (`verae-app-sdk/hello-cube/`)
 
 - Manifest: launchable + folderAction; `fileExtensions: ["cube"]`;

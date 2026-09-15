@@ -16,7 +16,8 @@
         {"name": "iso-export", "title": "ISO Export", "blurb": "Enqueue verae.cube.export for host xorriso ISO packager."},
         {"name": "itad-board", "title": "ITAD Board", "blurb": "Kanban pickup through wipe and sale; append via outbox."},
         {"name": "sig-verify", "title": "Sig Verify", "blurb": "List valid/revoked signatures; enqueue verae.sig.verify."},
-        {"name": "connector-status", "title": "Conn Status", "blurb": "List outbox pending vs inbox acked connector jobs."}
+        {"name": "connector-status", "title": "Conn Status", "blurb": "List outbox pending vs inbox acked connector jobs."},
+        {"name": "pfc-inspect", "title": "PFC Inspect", "blurb": "k-of-n inspect via cryptree outbox; host connector, no NATS in the iframe."}
       ]
     },
     {
